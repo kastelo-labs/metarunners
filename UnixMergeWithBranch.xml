@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta-runner name="Merge with branch (bash)">
+  <description>Merges the current branch with another branch</description>
+  <settings>
+	<parameters>
+		<param name="mergeWith.branch" value="master" spec="text display='normal' label='Branch to merge with'" />
+		<param name="mergeWith.name" value="TeamCity" spec="text display='normal' label='Git user name'" />
+		<param name="mergeWith.email" value="teamcity@example.com" spec="text display='normal' label='Git user email'" />
+		<param name="mergeWith.only" value="*" spec="text display='normal' label='Only branches that match'" />
+	</parameters>
+    <build-runners>
+      <runner name="Merge with branch (bash)" type="simpleRunner">
+        <parameters>
+          <param name="script.content"><![CDATA[#!/bin/bash
+set -euo pipefail
+
+if [[ %teamcity.build.branch% != %mergeWith.only% ]] ; then
+  echo Skipping merge for branch "%teamcity.build.branch%" not matching pattern "%mergeWith.only%"
+  exit 0
+fi
+if [[ "%teamcity.build.branch%" == "%mergeWith.branch%" ]] ; then
+  echo No need to merge with current branch
+  exit 0
+fi
+
+git config user.email "%mergeWith.name%"
+git config user.name "%mergeWith.email%"
+git fetch origin %mergeWith.branch%:%mergeWith.branch%
+git merge %mergeWith.branch%
+]]></param>
+          <param name="teamcity.step.mode" value="default" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
+    </build-runners>
+    <requirements>
+      <matches id="RQ_4" name="teamcity.agent.jvm.os.name" value="Linux|Mac OS X" />
+    </requirements>
+  </settings>
+</meta-runner>
+
+

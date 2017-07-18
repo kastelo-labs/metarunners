@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta-runner name="Go test">
+  <description>Runs go test in the checkout directory</description>
+  <settings>
+    <build-runners>
+      <runner name="Go test" type="simpleRunner">
+        <parameters>
+		<param name="script.content"><![CDATA[#!/bin/bash
+set -euo pipefail
+
+GOPATH=%teamcity.agent.home.dir%/go go get github.com/2tvenom/go-test-teamcity
+go test -race -v | %teamcity.agent.home.dir%/go/bin/go-test-teamcity
+]]></param>
+          <param name="teamcity.step.mode" value="default" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
+    </build-runners>
+  </settings>
+</meta-runner>
+
+

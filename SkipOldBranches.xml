@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta-runner name="Skip old branches (bash)">
+  <description>Skip old branches</description>
+  <settings>
+    <parameters>
+      <param name="branch.maxAge.seconds" value="604800" spec="text regexp='|[0-9|]+' display='normal' validationMessage='Enter a number' label='Maximum branch age (seconds)' validationMode='regex'" />
+    </parameters>
+    <build-runners>
+      <runner name="Skip old branches" type="simpleRunner">
+        <parameters>
+          <param name="script.content"><![CDATA[#!/bin/bash
+
+then=$(git log -1 --format=%%at %build.vcs.number%)
+now=$(date +%s)
+age=$(expr "$now" - "$then")
+if [[ $age -gt %branch.maxAge.seconds% ]] ; then
+  echo "##teamcity[buildProblem description='Branch is too old']"
+fi]]></param>
+          <param name="teamcity.step.mode" value="default" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
+    </build-runners>
+    <requirements>
+      <matches id="RQ_4" name="teamcity.agent.jvm.os.name" value="Linux|Mac OS X" />
+    </requirements>
+  </settings>
+</meta-runner>
+
+

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta-runner name="Git describe build number (bash)">
+  <description>Sets the build number based on the git describe output</description>
+  <settings>
+    <build-runners>
+      <runner name="Git describe number (bash)" type="simpleRunner">
+        <parameters>
+          <param name="script.content"><![CDATA[#!/bin/bash
+version=$(git describe --always)
+echo "##teamcity[buildNumber '%build.number%-${version}']"
+echo "##teamcity[setParameter name='env.VERSION' value='${version}']"
+]]></param>
+          <param name="teamcity.step.mode" value="default" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
+    </build-runners>
+    <requirements>
+      <matches id="RQ_4" name="teamcity.agent.jvm.os.name" value="Linux|Mac OS X" />
+    </requirements>
+  </settings>
+</meta-runner>
+
+

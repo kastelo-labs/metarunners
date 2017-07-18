@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta-runner name="Merge with branch (ps)">
+  <description>Sets the build number based on the git describe output</description>
+  <settings>
+        <parameters>
+                <param name="mergeWith.branch" value="master" spec="text display='normal' label='Branch to merge with'" />
+                <param name="mergeWith.name" value="TeamCity" spec="text display='normal' label='Git user name'" />
+                <param name="mergeWith.email" value="teamcity@example.com" spec="text display='normal' label='Git user email'" />
+                <param name="mergeWith.only" value="*" spec="text display='normal' label='Only branches that match'" />
+        </parameters>
+    <build-runners>
+      <runner name="Merge with branch (ps)" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[
+if ("%teamcity.build.branch%" -notlike "%mergeWith.only%") {
+  echo "Skipping merge for branch %teamcity.build.branch% not matching pattern %mergeWith.only%"
+  exit 0
+}
+if ("%teamcity.build.branch%" -eq "%mergeWith.branch%") {
+  echo "No need to merge with current branch"
+  exit 0
+}
+
+git config user.email "%mergeWith.name%"
+git config user.name "%mergeWith.email%"
+git fetch origin %mergeWith.branch%:%mergeWith.branch%
+git merge %mergeWith.branch%
+]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
+    </build-runners>
+  </settings>
+</meta-runner>
+
+
